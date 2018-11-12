@@ -1,0 +1,19 @@
+spring:
+  profiles: dev
+  datasource:
+    url: "jdbc:mysql://localhost:3306/muti_lan?useSSL=false&autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull"
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+
+logging:
+  level:
+    etg.lan.demo.mapper: debug
+
+#server:
+#  port: 9202
+#
+##mybatis-plus
+#mybatis-plus:
+#  type-aliases-package: etg.estate.entity
+##  mapper-locations: classpath:mybatis/mapper/*.xml

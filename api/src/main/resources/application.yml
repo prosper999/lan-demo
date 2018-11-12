@@ -1,0 +1,30 @@
+server:
+  port: 9808
+
+spring:
+  profiles:
+    active: dev
+  messages:
+    basename: i18n/messages
+    cache-seconds: 3600
+    encoding: UTF-8
+
+
+#mybatis-plus
+mybatis-plus:
+  type-aliases-package: etg.lan.demo.entity
+#  mapper-locations: classpath:mybatis/mapper/*.xml
+#
+#securityDefinitions:
+#  APIKey:
+#    type: apiKey
+#    name: Authorization
+#    in: header
+#security:
+#  - APIKey: []
+
+redis:
+  host: 192.168.197.205
+  port: 6379
+  timeout: 0
+  password:
