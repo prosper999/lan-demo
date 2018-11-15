@@ -1,7 +1,6 @@
 package etg.lan.demo.backendcontroller;
 
 import etg.lan.demo.entity.SysOrg;
-import etg.lan.demo.service.LanDecorator;
 import etg.lan.demo.service.SysOrgService;
 import etg.result.Result;
 import etg.result.ResultGenerator;

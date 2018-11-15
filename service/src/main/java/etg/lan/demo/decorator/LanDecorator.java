@@ -1,4 +1,4 @@
-package etg.lan.demo.service;
+package etg.lan.demo.decorator;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.entity.TableFieldInfo;
@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.toolkit.TableInfoHelper;
 import etg.lan.demo.entity.SysLanBasic;
 import etg.lan.demo.entity.SysOrg;
+import etg.lan.demo.service.SysLanBasicService;
 import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.ReflectorFactory;
@@ -16,12 +17,13 @@ import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class LanDecorator {
+public class LanDecorator<T> {
 
     @Autowired
     SysLanBasicService sysLanBasicService;
@@ -36,7 +38,7 @@ public class LanDecorator {
      */
     private static final ReflectorFactory DEFAULT_REFLECTOR_FACTORY = new DefaultReflectorFactory();
 
-    public void filter(List<SysOrg> list, String lan) {
+    public void filter(List<T> list, String lan) {
         if (list == null || list.size() == 0) return;
         TableInfo tableInfo = TableInfoHelper.getTableInfo(list.get(0).getClass());
         String tableName = tableInfo.getTableName();
@@ -44,7 +46,7 @@ public class LanDecorator {
         //根据表名，查找有哪些列是多语言的
         List<String> columnList = getLanColumnListByTableName(tableName);
         //遍历数据记录
-        for (SysOrg org : list) {
+        for (T org : list) {
             //遍历每一列
             for (TableFieldInfo fieldInfo : tableFieldInfoList) {
                 //判断这个列是否是多语言列
@@ -54,7 +56,6 @@ public class LanDecorator {
                     MetaObject metaObject = MetaObject.forObject(org,
                             DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY, DEFAULT_REFLECTOR_FACTORY);
                     String value = (String) metaObject.getValue(fieldInfo.getProperty());
-//                    String value = org.getName();
                     try {
                         JSONObject jsonObject = JSONObject.parseObject(value);
                         if (jsonObject != null) {
@@ -63,8 +64,7 @@ public class LanDecorator {
                                 newValue = (String) jsonObject.get(lan);
                             else
                                 newValue = (String) jsonObject.get("Default");
-                            metaObject.setValue(fieldInfo.getProperty(),newValue);
-//                            org.setName(newValue);
+                            metaObject.setValue(fieldInfo.getProperty(), newValue);
                         }
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
@@ -74,11 +74,17 @@ public class LanDecorator {
         }
     }
 
+    public void filter(T t, String lan) {
+        List<T> list = new ArrayList<T>();
+        list.add(t);
+        filter(list, lan);
+    }
+
     private List<String> getLanColumnListByTableName(String tableName) {
         List<String> columnList = new ArrayList<>();
         EntityWrapper<SysLanBasic> wrapper = new EntityWrapper<SysLanBasic>();
         wrapper.eq("table_name", tableName);
-        wrapper.eq("used",true);
+        wrapper.eq("used", true);
         List<SysLanBasic> sysLanBasicList = sysLanBasicService.selectList(wrapper);
         if (sysLanBasicList != null && sysLanBasicList.size() > 0) {
             columnList = sysLanBasicList.stream()
@@ -88,26 +94,5 @@ public class LanDecorator {
         return columnList;
     }
 
-//    private Map<String,List<String>> getLanListByTableName(String tableName){
-//        Map<String,List<String>> map = new HashMap<String, List<String>>();
-//        EntityWrapper<SysLanBasic> wrapper = new EntityWrapper<SysLanBasic>();
-//        wrapper.eq("table_name",tableName);
-//        List<SysLanBasic> sysLanBasicList = sysLanBasicService.selectList(wrapper);
-//        if(sysLanBasicList != null && sysLanBasicList.size() > 0){
-//            for(SysLanBasic sysLanBasic:sysLanBasicList){
-//                EntityWrapper<SysLanConfig> wrapper1 = new EntityWrapper<>();
-//                wrapper1.eq("id",sysLanBasic.getId());
-//                List<SysLanConfig> sysLanConfigList = sysLanConfigService.selectList(wrapper1);
-//                if(sysLanConfigList != null && sysLanConfigList.size() > 0){
-//                    List<String> list = sysLanConfigList.stream()
-//                            .map(SysLanConfig::getLan)
-//                            .collect(Collectors.toList());
-//                    map.put(sysLanBasic.getColumnName(),list);
-//                }
-//            }
-//        }
-//        return  map;
-//    }
-
-
 }
+

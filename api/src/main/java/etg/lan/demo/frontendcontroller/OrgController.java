@@ -1,15 +1,12 @@
 package etg.lan.demo.frontendcontroller;
 
 import etg.lan.demo.core.BaseController;
+import etg.lan.demo.decorator.LanDecorator;
 import etg.lan.demo.entity.SysOrg;
-import etg.lan.demo.service.LanDecorator;
 import etg.lan.demo.service.SysOrgService;
 import etg.result.Result;
 import etg.result.ResultGenerator;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,5 +31,18 @@ public class OrgController extends BaseController {
         lanDecorator.filter(sysOrgList,lan);
         return ResultGenerator.genSuccessResult(sysOrgList);
     }
+
+    @RequestMapping(value = "/querytestlist",method = RequestMethod.GET)
+    public Result<List<SysOrg>> querylist(String lan){
+        List<SysOrg> sysOrgList = sysOrgService.getList(lan);
+        return ResultGenerator.genSuccessResult(sysOrgList);
+    }
+
+    @RequestMapping(value = "/querytestobj",method = RequestMethod.GET)
+    public Result<List<SysOrg>> queryobj(String lan){
+        SysOrg sysOrg = sysOrgService.getObject(lan);
+        return ResultGenerator.genSuccessResult(sysOrg);
+    }
+
 
 }
